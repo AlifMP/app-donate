@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Campaign extends Model
 {
@@ -24,5 +25,15 @@ class Campaign extends Model
     public function donations()
     {
         return $this->hasMany(Donation::class);
+    }
+    public function sumDonation()
+    {
+        return $this->hasMany(Donation::class)->selectRaw('donations.campaign_id,SUM(donations.amount) as total')->where('donations.status', 'success')->groupBy('donations.campaign_id');
+    }
+    public function image(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => asset('/storage/campaigns/' . $value),
+        );
     }
 }
